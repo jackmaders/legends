@@ -24,10 +24,6 @@ internal sealed class LegendsGame : Game
     private ButtonState _previousLeftButton = ButtonState.Released;
     private readonly BattleState _battleState = new();
 
-
-
-
-
     // Attach graphics setup to this game before Run begins initialization.
     public LegendsGame()
     {
