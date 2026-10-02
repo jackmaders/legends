@@ -21,10 +21,10 @@ internal sealed class LegendsGame : Game
     private const int TileSize = 40;
     private const int BoardLeft = 340;
     private const int BoardTop = 80;
-    private Point? _hoveredCell;
+    private GridCell? _hoveredCell;
     private bool _heroSelected;
     private ButtonState _previousLeftButton = ButtonState.Released;
-    private readonly Point _heroCell = new(7, 6);
+    private readonly GridCell _heroCell = new(7, 6);
 
 
 
@@ -96,7 +96,7 @@ internal sealed class LegendsGame : Game
     }
 
 
-    private static Point? GetBoardCell(Point screenPosition)
+    private static GridCell? GetBoardCell(Point screenPosition)
     {
         var boardBounds = new Rectangle(
             BoardLeft,
@@ -109,7 +109,7 @@ internal sealed class LegendsGame : Game
             return null;
         }
 
-        return new Point(
+        return new GridCell(
             (screenPosition.X - BoardLeft) / TileSize,
             (screenPosition.Y - BoardTop) / TileSize);
     }
@@ -137,7 +137,7 @@ internal sealed class LegendsGame : Game
                 var y = BoardTop + row * TileSize;
                 var color = (row + column) % 2 == 0 ? Color.Gray : Color.DarkGray;
 
-                var cell = new Point(column, row);
+                var cell = new GridCell(column, row);
                 if (_heroSelected && _heroCell == cell)
                 {
                     color = Color.Orange;
@@ -161,8 +161,8 @@ internal sealed class LegendsGame : Game
         var markerSize = TileSize - inset * 2;
 
         var markerBounds = new Rectangle(
-            BoardLeft + _heroCell.X * TileSize + inset,
-            BoardTop + _heroCell.Y * TileSize + inset,
+            BoardLeft + _heroCell.Column * TileSize + inset,
+            BoardTop + _heroCell.Row * TileSize + inset,
             markerSize,
             markerSize);
 
