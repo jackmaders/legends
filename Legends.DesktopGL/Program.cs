@@ -16,11 +16,10 @@ internal sealed class LegendsGame : Game
     private SpriteBatch _spriteBatch = null!;
     private Texture2D _pixel = null!;
     private Texture2D _circle = null!;
-    private const int BoardColumns = 15;
-    private const int BoardRows = 14;
-    private const int TileSize = 40;
-    private const int BoardLeft = 340;
-    private const int BoardTop = 80;
+    private readonly Grid _grid = new(columns: 15, rows: 14);
+    private const int CellSize = 40;
+    private const int GridLeft = 340;
+    private const int GridTop = 80;
     private GridCell? _hoveredCell;
     private bool _heroSelected;
     private ButtonState _previousLeftButton = ButtonState.Released;
@@ -77,8 +76,7 @@ internal sealed class LegendsGame : Game
         var mouse = Mouse.GetState();
         var mousePosition = new Point(mouse.X, mouse.Y);
 
-        _hoveredCell = GetBoardCell(new Point(mouse.X, mouse.Y));
-
+        _hoveredCell = GetGridCellAt(mousePosition);
 
         var justPressed =
             mouse.LeftButton == ButtonState.Pressed &&
@@ -96,22 +94,30 @@ internal sealed class LegendsGame : Game
     }
 
 
-    private static GridCell? GetBoardCell(Point screenPosition)
+    private GridCell? GetGridCellAt(Point screenPosition)
     {
-        var boardBounds = new Rectangle(
-            BoardLeft,
-            BoardTop,
-            BoardColumns * TileSize,
-            BoardRows * TileSize);
+        var gridPixelBounds = new Rectangle(
+            GridLeft,
+            GridTop,
+            _grid.Columns * CellSize,
+            _grid.Rows * CellSize);
 
-        if (!boardBounds.Contains(screenPosition))
+        if (!gridPixelBounds.Contains(screenPosition))
         {
             return null;
         }
 
-        return new GridCell(
-            (screenPosition.X - BoardLeft) / TileSize,
-            (screenPosition.Y - BoardTop) / TileSize);
+        var cell = new GridCell(
+            (screenPosition.X - GridLeft) / CellSize,
+            (screenPosition.Y - GridTop) / CellSize);
+
+
+        if (!_grid.ContainsCell(cell))
+        {
+            return null;
+        }
+
+        return cell;
     }
 
 
@@ -129,12 +135,12 @@ internal sealed class LegendsGame : Game
         _spriteBatch.Draw(_pixel, new Rectangle(40, 40, 80, 80), Color.Orange);
         _spriteBatch.Draw(_circle, new Rectangle(160, 40, 80, 80), Color.Green);
 
-        for (var row = 0; row < BoardRows; row++)
+        for (var row = 0; row < _grid.Rows; row++)
         {
-            for (var column = 0; column < BoardColumns; column++)
+            for (var column = 0; column < _grid.Columns; column++)
             {
-                var x = BoardLeft + column * TileSize;
-                var y = BoardTop + row * TileSize;
+                var x = GridLeft + column * CellSize;
+                var y = GridTop + row * CellSize;
                 var color = (row + column) % 2 == 0 ? Color.Gray : Color.DarkGray;
 
                 var cell = new GridCell(column, row);
@@ -152,17 +158,17 @@ internal sealed class LegendsGame : Game
 
                 _spriteBatch.Draw(
                     _pixel,
-                    new Rectangle(x, y, TileSize, TileSize),
+                    new Rectangle(x, y, CellSize, CellSize),
                     color);
             }
         }
 
         const int inset = 4;
-        var markerSize = TileSize - inset * 2;
+        var markerSize = CellSize - inset * 2;
 
         var markerBounds = new Rectangle(
-            BoardLeft + _heroCell.Column * TileSize + inset,
-            BoardTop + _heroCell.Row * TileSize + inset,
+            GridLeft + _heroCell.Column * CellSize + inset,
+            GridTop + _heroCell.Row * CellSize + inset,
             markerSize,
             markerSize);
 
