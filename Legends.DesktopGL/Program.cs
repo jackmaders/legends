@@ -16,14 +16,14 @@ internal sealed class LegendsGame : Game
     private SpriteBatch _spriteBatch = null!;
     private Texture2D _pixel = null!;
     private Texture2D _circle = null!;
-    private readonly Grid _grid = new(columns: 15, rows: 14);
     private const int CellSize = 40;
     private const int GridLeft = 340;
     private const int GridTop = 80;
     private GridCell? _hoveredCell;
     private bool _heroSelected;
     private ButtonState _previousLeftButton = ButtonState.Released;
-    private readonly Hero _hero = new(new GridCell(7, 6));
+    private readonly BattleState _battleState = new();
+
 
 
 
@@ -84,7 +84,7 @@ internal sealed class LegendsGame : Game
 
         if (justPressed && _hoveredCell.HasValue)
         {
-            _heroSelected = _hoveredCell.Value == _hero.Cell;
+            _heroSelected = _hoveredCell.Value == _battleState.Hero.Cell;
         }
 
         _previousLeftButton = mouse.LeftButton;
@@ -99,8 +99,8 @@ internal sealed class LegendsGame : Game
         var gridPixelBounds = new Rectangle(
             GridLeft,
             GridTop,
-            _grid.Columns * CellSize,
-            _grid.Rows * CellSize);
+            _battleState.Grid.Columns * CellSize,
+            _battleState.Grid.Rows * CellSize);
 
         if (!gridPixelBounds.Contains(screenPosition))
         {
@@ -112,7 +112,7 @@ internal sealed class LegendsGame : Game
             (screenPosition.Y - GridTop) / CellSize);
 
 
-        if (!_grid.ContainsCell(cell))
+        if (!_battleState.Grid.ContainsCell(cell))
         {
             return null;
         }
@@ -135,16 +135,16 @@ internal sealed class LegendsGame : Game
         _spriteBatch.Draw(_pixel, new Rectangle(40, 40, 80, 80), Color.Orange);
         _spriteBatch.Draw(_circle, new Rectangle(160, 40, 80, 80), Color.Green);
 
-        for (var row = 0; row < _grid.Rows; row++)
+        for (var row = 0; row < _battleState.Grid.Rows; row++)
         {
-            for (var column = 0; column < _grid.Columns; column++)
+            for (var column = 0; column < _battleState.Grid.Columns; column++)
             {
                 var x = GridLeft + column * CellSize;
                 var y = GridTop + row * CellSize;
                 var color = (row + column) % 2 == 0 ? Color.Gray : Color.DarkGray;
 
                 var cell = new GridCell(column, row);
-                if (_heroSelected && _hero.Cell == cell)
+                if (_heroSelected && _battleState.Hero.Cell == cell)
                 {
                     color = Color.Orange;
                 }
@@ -167,8 +167,8 @@ internal sealed class LegendsGame : Game
         var markerSize = CellSize - inset * 2;
 
         var markerBounds = new Rectangle(
-            GridLeft + _hero.Cell.Column * CellSize + inset,
-            GridTop + _hero.Cell.Row * CellSize + inset,
+            GridLeft + _battleState.Hero.Cell.Column * CellSize + inset,
+            GridTop + _battleState.Hero.Cell.Row * CellSize + inset,
             markerSize,
             markerSize);
 
