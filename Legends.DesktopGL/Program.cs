@@ -173,13 +173,21 @@ internal sealed class LegendsGame : Game
         const int inset = 4;
         var markerSize = CellSize - inset * 2;
 
-        var markerBounds = new Rectangle(
+        var heroMarker = new Rectangle(
             GridLeft + _battleState.Hero.Cell.Column * CellSize + inset,
             GridTop + _battleState.Hero.Cell.Row * CellSize + inset,
             markerSize,
             markerSize);
 
-        _spriteBatch.Draw(_circle, markerBounds, Color.Red);
+
+        var enemyMarker = new Rectangle(
+            GridLeft + _battleState.Enemy.Cell.Column * CellSize + inset,
+            GridTop + _battleState.Enemy.Cell.Row * CellSize + inset,
+            markerSize,
+            markerSize);
+
+        _spriteBatch.Draw(_circle, heroMarker, Color.Red);
+        _spriteBatch.Draw(_circle, enemyMarker, Color.Green);
 
 
 
