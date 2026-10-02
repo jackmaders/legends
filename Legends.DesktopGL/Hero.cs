@@ -6,4 +6,9 @@ internal sealed class Hero
     {
         Cell = initialCell;
     }
+
+    public void MoveTo(GridCell cell)
+    {
+        Cell = cell;
+    }
 }

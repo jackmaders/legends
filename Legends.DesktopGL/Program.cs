@@ -80,8 +80,19 @@ internal sealed class LegendsGame : Game
 
         if (justPressed && _hoveredCell.HasValue)
         {
-            _heroSelected = _hoveredCell.Value == _battleState.Hero.Cell;
+            var clickedCell = _hoveredCell.Value;
+
+            if (_heroSelected)
+            {
+                _battleState.MoveHeroTo(clickedCell);
+                _heroSelected = false;
+            }
+            else
+            {
+                _heroSelected = clickedCell == _battleState.Hero.Cell;
+            }
         }
+
 
         _previousLeftButton = mouse.LeftButton;
 
