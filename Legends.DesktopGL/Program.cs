@@ -22,6 +22,8 @@ internal sealed class LegendsGame : Game
     private const int BoardLeft = 340;
     private const int BoardTop = 80;
     private Point? _hoveredCell;
+    private Point? _selectedCell;
+    private ButtonState _previousLeftButton = ButtonState.Released;
 
 
 
@@ -76,6 +78,18 @@ internal sealed class LegendsGame : Game
         _hoveredCell = GetBoardCell(new Point(mouse.X, mouse.Y));
 
 
+        var justPressed =
+            mouse.LeftButton == ButtonState.Pressed &&
+            _previousLeftButton == ButtonState.Released;
+
+        if (justPressed && _hoveredCell.HasValue)
+        {
+            _selectedCell = _hoveredCell;
+        }
+
+        _previousLeftButton = mouse.LeftButton;
+
+
         base.Update(gameTime);
     }
 
@@ -121,11 +135,17 @@ internal sealed class LegendsGame : Game
                 var y = BoardTop + row * TileSize;
                 var color = (row + column) % 2 == 0 ? Color.Gray : Color.DarkGray;
 
+                var cell = new Point(column, row);
 
-                if (_hoveredCell == new Point(column, row))
+                if (_selectedCell == cell)
+                {
+                    color = Color.Orange;
+                }
+                else if (_hoveredCell == cell)
                 {
                     color = Color.Yellow;
                 }
+
 
 
                 _spriteBatch.Draw(
