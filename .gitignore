@@ -1,0 +1,19 @@
+# .NET build and test output
+[Bb]in/
+[Oo]bj/
+[Ll]ogs/
+TestResults/
+artifacts/
+
+# IDE-local files
+.vs/
+.idea/
+.zed/
+.vscode/
+*.user
+*.suo
+*.sln.docstates
+
+# OS metadata
+.DS_Store
+Thumbs.db
