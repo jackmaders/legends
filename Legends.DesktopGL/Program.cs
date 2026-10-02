@@ -23,7 +23,7 @@ internal sealed class LegendsGame : Game
     private GridCell? _hoveredCell;
     private bool _heroSelected;
     private ButtonState _previousLeftButton = ButtonState.Released;
-    private readonly GridCell _heroCell = new(7, 6);
+    private readonly Hero _hero = new(new GridCell(7, 6));
 
 
 
@@ -84,7 +84,7 @@ internal sealed class LegendsGame : Game
 
         if (justPressed && _hoveredCell.HasValue)
         {
-            _heroSelected = _hoveredCell.Value == _heroCell;
+            _heroSelected = _hoveredCell.Value == _hero.Cell;
         }
 
         _previousLeftButton = mouse.LeftButton;
@@ -144,7 +144,7 @@ internal sealed class LegendsGame : Game
                 var color = (row + column) % 2 == 0 ? Color.Gray : Color.DarkGray;
 
                 var cell = new GridCell(column, row);
-                if (_heroSelected && _heroCell == cell)
+                if (_heroSelected && _hero.Cell == cell)
                 {
                     color = Color.Orange;
                 }
@@ -167,8 +167,8 @@ internal sealed class LegendsGame : Game
         var markerSize = CellSize - inset * 2;
 
         var markerBounds = new Rectangle(
-            GridLeft + _heroCell.Column * CellSize + inset,
-            GridTop + _heroCell.Row * CellSize + inset,
+            GridLeft + _hero.Cell.Column * CellSize + inset,
+            GridTop + _hero.Cell.Row * CellSize + inset,
             markerSize,
             markerSize);
 
