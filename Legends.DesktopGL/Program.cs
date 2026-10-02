@@ -22,7 +22,7 @@ internal sealed class LegendsGame : Game
     private const int BoardLeft = 340;
     private const int BoardTop = 80;
     private Point? _hoveredCell;
-    private Point? _selectedCell;
+    private bool _heroSelected;
     private ButtonState _previousLeftButton = ButtonState.Released;
     private readonly Point _heroCell = new(7, 6);
 
@@ -86,7 +86,7 @@ internal sealed class LegendsGame : Game
 
         if (justPressed && _hoveredCell.HasValue)
         {
-            _selectedCell = _hoveredCell;
+            _heroSelected = _hoveredCell.Value == _heroCell;
         }
 
         _previousLeftButton = mouse.LeftButton;
@@ -138,8 +138,7 @@ internal sealed class LegendsGame : Game
                 var color = (row + column) % 2 == 0 ? Color.Gray : Color.DarkGray;
 
                 var cell = new Point(column, row);
-
-                if (_selectedCell == cell)
+                if (_heroSelected && _heroCell == cell)
                 {
                     color = Color.Orange;
                 }
@@ -147,6 +146,7 @@ internal sealed class LegendsGame : Game
                 {
                     color = Color.Yellow;
                 }
+
 
 
 
