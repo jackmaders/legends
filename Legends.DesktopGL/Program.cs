@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 // Create the game object; `using` disposes it when Run returns.
 using var game = new LegendsGame();
@@ -15,6 +16,12 @@ internal sealed class LegendsGame : Game
     private SpriteBatch _spriteBatch = null!;
     private Texture2D _pixel = null!;
     private Texture2D _circle = null!;
+    private const int BoardColumns = 15;
+    private const int BoardRows = 14;
+    private const int TileSize = 40;
+    private const int BoardLeft = 340;
+    private const int BoardTop = 80;
+    private Point? _hoveredCell;
 
 
 
@@ -61,6 +68,37 @@ internal sealed class LegendsGame : Game
 
     }
 
+    protected override void Update(GameTime gameTime)
+    {
+        var mouse = Mouse.GetState();
+        var mousePosition = new Point(mouse.X, mouse.Y);
+
+        _hoveredCell = GetBoardCell(new Point(mouse.X, mouse.Y));
+
+
+        base.Update(gameTime);
+    }
+
+
+    private static Point? GetBoardCell(Point screenPosition)
+    {
+        var boardBounds = new Rectangle(
+            BoardLeft,
+            BoardTop,
+            BoardColumns * TileSize,
+            BoardRows * TileSize);
+
+        if (!boardBounds.Contains(screenPosition))
+        {
+            return null;
+        }
+
+        return new Point(
+            (screenPosition.X - BoardLeft) / TileSize,
+            (screenPosition.Y - BoardTop) / TileSize);
+    }
+
+
 
 
     // MonoGame calls Draw when it renders a frame; GameTime carries frame timing information.
@@ -70,29 +108,29 @@ internal sealed class LegendsGame : Game
         // Game exposes GraphicsDevice; the manager initializes and configures it.
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
-        const int columns = 15;
-        const int rows = 14;
-        const int tileSize = 40;
-        const int boardLeft = 340;
-        const int boardTop = 80;
-
-
 
         _spriteBatch.Begin();
         _spriteBatch.Draw(_pixel, new Rectangle(40, 40, 80, 80), Color.Orange);
         _spriteBatch.Draw(_circle, new Rectangle(160, 40, 80, 80), Color.Green);
 
-        for (var row = 0; row < rows; row++)
+        for (var row = 0; row < BoardRows; row++)
         {
-            for (var column = 0; column < columns; column++)
+            for (var column = 0; column < BoardColumns; column++)
             {
-                var x = boardLeft + column * tileSize;
-                var y = boardTop + row * tileSize;
+                var x = BoardLeft + column * TileSize;
+                var y = BoardTop + row * TileSize;
                 var color = (row + column) % 2 == 0 ? Color.Gray : Color.DarkGray;
+
+
+                if (_hoveredCell == new Point(column, row))
+                {
+                    color = Color.Yellow;
+                }
+
 
                 _spriteBatch.Draw(
                     _pixel,
-                    new Rectangle(x, y, tileSize, tileSize),
+                    new Rectangle(x, y, TileSize, TileSize),
                     color);
             }
         }
