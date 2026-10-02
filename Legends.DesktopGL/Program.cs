@@ -24,6 +24,8 @@ internal sealed class LegendsGame : Game
     private Point? _hoveredCell;
     private Point? _selectedCell;
     private ButtonState _previousLeftButton = ButtonState.Released;
+    private readonly Point _heroCell = new(7, 6);
+
 
 
 
@@ -154,6 +156,19 @@ internal sealed class LegendsGame : Game
                     color);
             }
         }
+
+        const int inset = 4;
+        var markerSize = TileSize - inset * 2;
+
+        var markerBounds = new Rectangle(
+            BoardLeft + _heroCell.X * TileSize + inset,
+            BoardTop + _heroCell.Y * TileSize + inset,
+            markerSize,
+            markerSize);
+
+        _spriteBatch.Draw(_circle, markerBounds, Color.Red);
+
+
 
         _spriteBatch.End();
 
