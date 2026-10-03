@@ -10,6 +10,8 @@ internal sealed class BattleState
     public Hero Hero { get; }
     public Enemy Enemy { get; }
     public TurnOwner CurrentTurn { get; private set; } = TurnOwner.Hero;
+    public GridCell CurrentUnitCell =>
+        CurrentTurn == TurnOwner.Hero ? Hero.Cell : Enemy.Cell;
     public bool HasMovedThisTurn { get; private set; }
     public bool HasAttackedThisTurn { get; private set; }
     public bool IsBattleOver => !Hero.IsAlive || !Enemy.IsAlive;
@@ -22,53 +24,46 @@ internal sealed class BattleState
         Enemy = new Enemy(new GridCell(6, 9));
     }
 
-    public void MoveHeroTo(GridCell destination)
-
+    public void MoveCurrentUnitTo(GridCell destination)
     {
-        var enemyOccupiesDestination = Enemy.IsAlive && Enemy.Cell == destination;
-
         if (IsBattleOver ||
-            CurrentTurn != TurnOwner.Hero ||
             HasMovedThisTurn ||
             !Grid.ContainsCell(destination) ||
-            destination == Hero.Cell ||
-            enemyOccupiesDestination)
+            destination == CurrentUnitCell ||
+            IsOpponentCell(destination))
         {
             return;
         }
 
-        Hero.MoveTo(destination);
+        if (CurrentTurn == TurnOwner.Hero)
+        {
+            Hero.MoveTo(destination);
+        }
+        else
+        {
+            Enemy.MoveTo(destination);
+        }
+
         HasMovedThisTurn = true;
         EndTurnIfBothActionsUsed();
     }
 
-    public void AttackEnemy()
+    public void AttackOpponent()
     {
-        if (IsBattleOver ||
-            CurrentTurn != TurnOwner.Hero ||
-            HasAttackedThisTurn ||
-            !Enemy.IsAlive)
+        if (IsBattleOver || HasAttackedThisTurn)
         {
             return;
         }
 
-        Enemy.TakeDamage(1);
-        HasAttackedThisTurn = true;
-        EndTurnIfBothActionsUsed();
-    }
-
-
-    public void AttackHero()
-    {
-        if (IsBattleOver ||
-            CurrentTurn != TurnOwner.Enemy ||
-            HasAttackedThisTurn ||
-            !Hero.IsAlive)
+        if (CurrentTurn == TurnOwner.Hero)
         {
-            return;
+            Enemy.TakeDamage(1);
+        }
+        else
+        {
+            Hero.TakeDamage(1);
         }
 
-        Hero.TakeDamage(1);
         HasAttackedThisTurn = true;
         EndTurnIfBothActionsUsed();
     }
@@ -90,22 +85,11 @@ internal sealed class BattleState
         HasAttackedThisTurn = false;
     }
 
-    public void MoveEnemyTo(GridCell destination)
+    public bool IsOpponentCell(GridCell cell)
     {
-        if (IsBattleOver ||
-            CurrentTurn != TurnOwner.Enemy ||
-            HasMovedThisTurn ||
-            !Enemy.IsAlive ||
-            !Grid.ContainsCell(destination) ||
-            destination == Enemy.Cell ||
-            destination == Hero.Cell)
-        {
-            return;
-        }
-
-        Enemy.MoveTo(destination);
-        HasMovedThisTurn = true;
-        EndTurnIfBothActionsUsed();
+        return CurrentTurn == TurnOwner.Hero
+            ? Enemy.IsAlive && Enemy.Cell == cell
+            : Hero.IsAlive && Hero.Cell == cell;
     }
 
     private void EndTurnIfBothActionsUsed()

@@ -6,7 +6,6 @@ internal sealed class LegendsGame : Game
 {
     private readonly GraphicsDeviceManager _graphics;
     private readonly BattleState _battleState = new();
-    private readonly BattleViewport _battleViewport = new();
     private readonly BattleInputController _battleInputController;
     private BattleRenderer _battleRenderer = null!;
     private GridCell? _hoveredCell;
@@ -28,7 +27,7 @@ internal sealed class LegendsGame : Game
 
     protected override void LoadContent()
     {
-        _battleRenderer = new BattleRenderer(GraphicsDevice, Content, _battleViewport);
+        _battleRenderer = new BattleRenderer(GraphicsDevice, Content);
     }
 
     protected override void Update(GameTime gameTime)

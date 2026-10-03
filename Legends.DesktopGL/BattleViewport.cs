@@ -1,12 +1,12 @@
 using Microsoft.Xna.Framework;
 
-internal sealed class BattleViewport
+internal static class BattleViewport
 {
     private const int CellSize = 40;
     private const int GridLeft = 340;
     private const int GridTop = 80;
 
-    static public GridCell? GetGridCellAt(Point screenPosition, Grid grid)
+    public static GridCell? GetGridCellAt(Point screenPosition, Grid grid)
     {
         var gridPixelBounds = new Rectangle(
             GridLeft,
@@ -26,7 +26,7 @@ internal sealed class BattleViewport
         return grid.ContainsCell(cell) ? cell : null;
     }
 
-    static public Rectangle GetCellBounds(GridCell cell)
+    public static Rectangle GetCellBounds(GridCell cell)
     {
         return new Rectangle(
             GridLeft + cell.Column * CellSize,

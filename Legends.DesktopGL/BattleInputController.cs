@@ -36,43 +36,22 @@ internal sealed class BattleInputController(BattleState battleState)
 
     private void HandleCellClick(GridCell clickedCell)
     {
-        if (SelectedUnit == TurnOwner.Hero)
+        if (SelectedUnit.HasValue)
         {
-            if (clickedCell == _battleState.Enemy.Cell && _battleState.Enemy.IsAlive)
+            if (_battleState.IsOpponentCell(clickedCell))
             {
-                _battleState.AttackEnemy();
+                _battleState.AttackOpponent();
             }
             else
             {
-                _battleState.MoveHeroTo(clickedCell);
+                _battleState.MoveCurrentUnitTo(clickedCell);
             }
 
             SelectedUnit = null;
         }
-        else if (SelectedUnit == TurnOwner.Enemy)
+        else if (clickedCell == _battleState.CurrentUnitCell)
         {
-            if (clickedCell == _battleState.Hero.Cell && _battleState.Hero.IsAlive)
-            {
-                _battleState.AttackHero();
-            }
-            else
-            {
-                _battleState.MoveEnemyTo(clickedCell);
-            }
-
-            SelectedUnit = null;
-        }
-        else if (_battleState.CurrentTurn == TurnOwner.Hero &&
-                 _battleState.Hero.IsAlive &&
-                 clickedCell == _battleState.Hero.Cell)
-        {
-            SelectedUnit = TurnOwner.Hero;
-        }
-        else if (_battleState.CurrentTurn == TurnOwner.Enemy &&
-                 _battleState.Enemy.IsAlive &&
-                 clickedCell == _battleState.Enemy.Cell)
-        {
-            SelectedUnit = TurnOwner.Enemy;
+            SelectedUnit = _battleState.CurrentTurn;
         }
     }
 }

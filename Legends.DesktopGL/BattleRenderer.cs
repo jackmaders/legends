@@ -11,8 +11,7 @@ internal sealed class BattleRenderer : IDisposable
 
     public BattleRenderer(
         GraphicsDevice graphicsDevice,
-        ContentManager content,
-        BattleViewport viewport)
+        ContentManager content)
     {
         _healthFont = content.Load<SpriteFont>("Fonts/Health");
         _spriteBatch = new SpriteBatch(graphicsDevice);
