@@ -15,7 +15,9 @@ internal sealed class LegendsGame : Game
     private const int GridTop = 80;
     private GridCell? _hoveredCell;
     private bool _heroSelected;
+    private bool _enemySelected;
     private ButtonState _previousLeftButton = ButtonState.Released;
+    private KeyboardState _previousKeyboardState;
     private readonly BattleState _battleState = new();
     private SpriteFont _healthFont = null!;
 
@@ -72,13 +74,23 @@ internal sealed class LegendsGame : Game
         var mouse = Mouse.GetState();
         var mousePosition = new Point(mouse.X, mouse.Y);
 
+        var keyboard = Keyboard.GetState();
+        var spaceJustPressed = keyboard.IsKeyDown(Keys.Space) && _previousKeyboardState.IsKeyUp(Keys.Space);
+
+        if (spaceJustPressed)
+        {
+            _battleState.EndTurn();
+            _heroSelected = false;
+            _enemySelected = false;
+        }
+
         _hoveredCell = GetGridCellAt(mousePosition);
 
         var justPressed =
             mouse.LeftButton == ButtonState.Pressed &&
             _previousLeftButton == ButtonState.Released;
 
-        if (justPressed && _hoveredCell.HasValue)
+        if (justPressed && _hoveredCell.HasValue && !_battleState.IsBattleOver)
         {
             var clickedCell = _hoveredCell.Value;
 
@@ -95,14 +107,36 @@ internal sealed class LegendsGame : Game
 
                 _heroSelected = false;
             }
+            else if (_enemySelected)
+            {
+                if (clickedCell == _battleState.Hero.Cell && _battleState.Hero.IsAlive)
+                {
+                    _battleState.AttackHero();
+                }
+                else
+                {
+                    _battleState.MoveEnemyTo(clickedCell);
+                }
+
+                _enemySelected = false;
+            }
             else
             {
-                _heroSelected = clickedCell == _battleState.Hero.Cell;
+                _heroSelected =
+                    _battleState.CurrentTurn == TurnOwner.Hero &&
+                    _battleState.Hero.IsAlive &&
+                    clickedCell == _battleState.Hero.Cell;
+
+                _enemySelected =
+                    _battleState.CurrentTurn == TurnOwner.Enemy &&
+                    _battleState.Enemy.IsAlive &&
+                    clickedCell == _battleState.Enemy.Cell;
             }
         }
 
 
         _previousLeftButton = mouse.LeftButton;
+        _previousKeyboardState = keyboard;
 
 
         base.Update(gameTime);
@@ -147,6 +181,14 @@ internal sealed class LegendsGame : Game
 
 
         _spriteBatch.Begin();
+
+        var turnText = _battleState.IsBattleOver
+            ? "Battle over"
+            : $"{_battleState.CurrentTurn} turn";
+
+        _spriteBatch.DrawString(_healthFont, turnText, new Vector2(40, 160), Color.White);
+
+
         _spriteBatch.Draw(_pixel, new Rectangle(40, 40, 80, 80), Color.Orange);
         _spriteBatch.Draw(_circle, new Rectangle(160, 40, 80, 80), Color.Green);
 
@@ -163,7 +205,13 @@ internal sealed class LegendsGame : Game
                 {
                     color = Color.Orange;
                 }
-                else if (_hoveredCell == cell)
+                else if (_enemySelected && _battleState.Enemy.Cell == cell)
+                {
+
+                    color = Color.Pink;
+
+                }
+                if (_hoveredCell == cell)
                 {
                     color = Color.Yellow;
                 }
@@ -209,8 +257,21 @@ internal sealed class LegendsGame : Game
             _spriteBatch.DrawString(_healthFont, hpText, textPosition, Color.White);
         }
 
+        var hero = _battleState.Hero;
+        if (hero.IsAlive)
+        {
+            _spriteBatch.Draw(_circle, heroMarker, Color.Red);
 
-        _spriteBatch.Draw(_circle, heroMarker, Color.Red);
+            var hpText = hero.Health.ToString();
+            var textSize = _healthFont.MeasureString(hpText);
+            var textPosition = new Vector2(
+                heroMarker.Center.X - textSize.X / 2f,
+                heroMarker.Center.Y - textSize.Y / 2f);
+
+            _spriteBatch.DrawString(_healthFont, hpText, textPosition, Color.White);
+        }
+
+
 
 
 
