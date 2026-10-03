@@ -1,13 +1,8 @@
-internal sealed class Hero
+internal sealed class Hero(GridCell initialCell)
 {
-    public GridCell Cell { get; private set; }
+    public GridCell Cell { get; private set; } = initialCell;
     public int Health { get; private set; } = 3;
     public bool IsAlive => Health > 0;
-
-    public Hero(GridCell initialCell)
-    {
-        Cell = initialCell;
-    }
 
     public void MoveTo(GridCell cell)
     {

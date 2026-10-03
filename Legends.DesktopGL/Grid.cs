@@ -5,11 +5,8 @@ internal sealed class Grid
 
     public Grid(int columns, int rows)
     {
-        if (columns <= 0)
-            throw new ArgumentOutOfRangeException(nameof(columns));
-
-        if (rows <= 0)
-            throw new ArgumentOutOfRangeException(nameof(rows));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(columns);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(rows);
 
         Columns = columns;
         Rows = rows;
