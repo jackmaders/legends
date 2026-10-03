@@ -13,9 +13,19 @@ internal sealed class BattleState
 
     public void MoveHeroTo(GridCell destination)
     {
-        if (Grid.ContainsCell(destination))
+        var enemyOccupiesDestination = Enemy.IsAlive && Enemy.Cell == destination;
+
+        if (Grid.ContainsCell(destination) && !enemyOccupiesDestination)
         {
             Hero.MoveTo(destination);
+        }
+    }
+
+    public void AttackEnemy()
+    {
+        if (Enemy.IsAlive)
+        {
+            Enemy.TakeDamage(1);
         }
     }
 }

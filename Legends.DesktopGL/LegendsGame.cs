@@ -82,14 +82,18 @@ internal sealed class LegendsGame : Game
         {
             var clickedCell = _hoveredCell.Value;
 
-            if (_heroSelected && clickedCell != _battleState.Enemy.Cell)
+            if (_heroSelected)
             {
-                _battleState.MoveHeroTo(clickedCell);
+                if (clickedCell == _battleState.Enemy.Cell && _battleState.Enemy.IsAlive)
+                {
+                    _battleState.AttackEnemy();
+                }
+                else
+                {
+                    _battleState.MoveHeroTo(clickedCell);
+                }
+
                 _heroSelected = false;
-            }
-            else if (clickedCell == _battleState.Enemy.Cell)
-            {
-                _battleState.Enemy.TakeDamage(1);
             }
             else
             {
@@ -192,7 +196,7 @@ internal sealed class LegendsGame : Game
 
         var enemy = _battleState.Enemy;
 
-        if (enemy.Health > 0)
+        if (enemy.IsAlive)
         {
             _spriteBatch.Draw(_circle, enemyMarker, Color.Green);
 
